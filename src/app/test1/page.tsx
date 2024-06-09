@@ -4,7 +4,7 @@ import { Spacer } from "@/app/components/Spacer";
 
 interface Test1State {
 	count?: number;
-};
+}
 
 const initialState: Test1State = {
 	count: undefined
@@ -86,15 +86,15 @@ const Test1Page = () => {
 	console.log("state.count", state.count);
 
 	function increase() {
-		middleware({ type: "INCREASE" })
+		void middleware({ type: "INCREASE" })
 	}
 
 	function decrease() {
-		middleware({ type: "DECREASE" })
+		void middleware({ type: "DECREASE" })
 	}
 
 	const asyncAction = () => {
-		middleware({ type: "ASYNC", count: 10 })
+		void middleware({ type: "ASYNC", count: 10 })
 	};
 
 	return (

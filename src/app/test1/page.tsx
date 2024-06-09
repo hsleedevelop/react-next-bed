@@ -11,8 +11,9 @@ const initialState: Test1State = {
 };
 
 const useInitialState = () => {
+	console.log("useInitialState");
 	return {
-		count: 0
+		count: 10
 	} as Test1State
 };
 
@@ -77,8 +78,8 @@ console.log("rcount", rcount);
 
 const Test1Page = () => {
 
-	const cacheState = useInitialState();
-	const [state, dispatch] = useReducer(reducer, cacheState,);
+	const cacheState = useInitialState;
+	const [state, dispatch] = useReducer(reducer, initialState, cacheState);
 	const middleware = useDispatchMiddleware(dispatch);
 
 	console.log("rcount#2", rcount++);

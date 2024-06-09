@@ -3,12 +3,18 @@ import React, { useReducer } from "react"
 import { Spacer } from "@/app/components/Spacer";
 
 interface Test1State {
-	count?: number
-}
+	count?: number;
+};
 
 const initialState: Test1State = {
 	count: undefined
-}
+};
+
+const useInitialState = () => {
+	return {
+		count: 0
+	} as Test1State
+};
 
 type Test1ActionType = "INIT" | "INCREASE" | "DECREASE" | "ASYNC";
 
@@ -31,10 +37,14 @@ const useDispatchMiddleware = (
 	dispatch: React.Dispatch<Test1Action>,
 ) => {
 
-	return (action: Test1Action) => {
-		switch(action.type) {
+	return async (action: Test1Action) => {
+		switch (action.type) {
 			case "ASYNC":
-
+				const count = await add10(action.count || 0);
+				dispatch({
+					type: "ASYNC",
+					count
+				});
 				break;
 			default:
 				dispatch(action);
@@ -55,6 +65,9 @@ const reducer = (state: Test1State, action: Test1Action) => {
 		case "DECREASE":
 			mstate = { ...state, count: (state.count || 0) - 1 }
 			break
+		case "ASYNC":
+			mstate = { ...state, count: (state.count || 0) + (action.count || 0) }
+			break
 	}
 	return mstate
 }
@@ -64,31 +77,36 @@ console.log("rcount", rcount);
 
 const Test1Page = () => {
 
-	const [state, dispatch] = useReducer(reducer, initialState, );
+	const cacheState = useInitialState();
+	const [state, dispatch] = useReducer(reducer, cacheState,);
 	const middleware = useDispatchMiddleware(dispatch);
 
 	console.log("rcount#2", rcount++);
+	console.log("state.count", state.count);
 
 	function increase() {
-		dispatch({ type: "INCREASE" })
+		middleware({ type: "INCREASE" })
 	}
 
-	async function decrease() {
-		//dispatch({ type: "DECREASE" })
-		console.log("state", state.count);
-		const result = await add10(state.count);
-		console.log("result", result);
+	function decrease() {
+		middleware({ type: "DECREASE" })
 	}
+
+	const asyncAction = () => {
+		middleware({ type: "ASYNC", count: 10 })
+	};
 
 	return (
 		<>
 			<div>Test1Page</div>
 			<Spacer />
 			<Spacer />
-			<button className={"bg-sky-200 border-1 p-4"} onClick={increase}> increase </button>
-			<span className={"p-4"}>count { state.count }</span>
-			{/*<button className={"bg-sky-200 border-1 p-4"} onClick={() => decrease(state.count)}> decrease </button>*/}
-			<button className={"bg-sky-200 border-1 p-4"} onClick={decrease}> decrease </button>
+			<div>
+				<button className={"bg-sky-200 border-1 p-4"} onClick={increase}>increase</button>
+				<span className={"p-4"}>count {state.count}</span>
+				<button className={"bg-sky-200 border-1 p-4"} onClick={decrease}>decrease</button>
+			</div>
+			<button className={"bg-sky-200 border-1 p-4"} onClick={asyncAction}>asyncAction</button>
 		</>
 	);
 };
